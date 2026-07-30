@@ -1,0 +1,5 @@
+name: Enterprise Finance & Trading Agent
+version: 1.4.0
+purpose: Automated stock portfolio rebalancing, market sentiment evaluation, and trade execution.
+human_oversight: Human-in-the-Loop Required for Orders > $10,000
+incident_contact: finance-security@enterprise.com

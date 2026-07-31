@@ -15,29 +15,33 @@ from app.services.compliance_engine import build_compliance_card_payload
 from app.services.framework_mapper import GovernanceFrameworkMapper
 
 
+from sqlalchemy import select
+
 async def seed_database():
     print("Initializing Agent Compliance Card Generator database...")
     await init_db()
 
     async with AsyncSessionLocal() as db:
-        # 1. Create Admin & Auditor Users
-        admin_user = User(
-            username="admin",
-            email="admin@agentcompliance.ai",
-            hashed_password=get_password_hash("admin123"),
-            full_name="Enterprise Admin",
-            role="Admin"
-        )
-        auditor_user = User(
-            username="auditor",
-            email="auditor@agentcompliance.ai",
-            hashed_password=get_password_hash("auditor123"),
-            full_name="Lead AI Auditor",
-            role="Auditor"
-        )
-        db.add(admin_user)
-        db.add(auditor_user)
-        await db.commit()
+        # 1. Create Admin & Auditor Users if not already present
+        res = await db.execute(select(User).where(User.username == "admin"))
+        if not res.scalar_one_or_none():
+            admin_user = User(
+                username="admin",
+                email="admin@agentcompliance.ai",
+                hashed_password=get_password_hash("admin123"),
+                full_name="Enterprise Admin",
+                role="Admin"
+            )
+            auditor_user = User(
+                username="auditor",
+                email="auditor@agentcompliance.ai",
+                hashed_password=get_password_hash("auditor123"),
+                full_name="Lead AI Auditor",
+                role="Auditor"
+            )
+            db.add(admin_user)
+            db.add(auditor_user)
+            await db.commit()
 
         # 2. Seed Sample Agents
         samples = [
@@ -49,6 +53,10 @@ async def seed_database():
         base_samples = os.path.join(os.path.dirname(__file__), "..", "samples")
 
         for key, name, version in samples:
+            existing_scan = await db.execute(select(AgentScan).where(AgentScan.agent_name == name))
+            if existing_scan.scalar_one_or_none():
+                continue
+
             sample_dir = os.path.join(base_samples, key)
             if os.path.exists(sample_dir):
                 discovered = discover_agent_assets(sample_dir)

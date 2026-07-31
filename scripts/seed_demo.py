@@ -25,7 +25,7 @@ async def seed_database():
     async with AsyncSessionLocal() as db:
         # 1. Create Admin & Auditor Users if not already present
         res = await db.execute(select(User).where(User.username == "admin"))
-        if not res.scalar_one_or_none():
+        if not res.scalars().first():
             admin_user = User(
                 username="admin",
                 email="admin@agentcompliance.ai",
@@ -55,7 +55,7 @@ async def seed_database():
 
         for key, name, version in samples:
             existing_scan = await db.execute(select(AgentScan).where(AgentScan.agent_name == name))
-            if existing_scan.scalar_one_or_none():
+            if existing_scan.scalars().first():
                 continue
 
             sample_dir = os.path.join(base_samples, key)

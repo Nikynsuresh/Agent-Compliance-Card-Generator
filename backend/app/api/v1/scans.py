@@ -63,7 +63,7 @@ async def scan_sample_agent(
     sample_key: str = "finance_agent",
     db: AsyncSession = Depends(get_db)
 ):
-    base_samples = "/Users/nikynsuresh/Documents/Aivar drive/samples"
+    base_samples = os.getenv("SAMPLES_DIR", os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "samples")))
     sample_path = os.path.join(base_samples, sample_key)
     
     if not os.path.exists(sample_path):

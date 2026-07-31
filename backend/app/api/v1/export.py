@@ -10,15 +10,27 @@ router = APIRouter()
 
 
 @router.get("/pdf/{scan_id}")
-async def export_pdf_report(scan_id: int, db: AsyncSession = Depends(get_db)):
-    res1 = await db.execute(select(AgentScan).where(AgentScan.id == scan_id))
-    scan = res1.scalars().first()
-    
-    res2 = await db.execute(select(ComplianceCard).where(ComplianceCard.scan_id == scan_id))
-    card = res2.scalars().first()
+async def export_pdf_report(scan_id: str, db: AsyncSession = Depends(get_db)):
+    target_id = None
+    try:
+        target_id = int(scan_id)
+    except (ValueError, TypeError):
+        pass
+
+    scan = None
+    if target_id is not None:
+        res1 = await db.execute(select(AgentScan).where(AgentScan.id == target_id))
+        scan = res1.scalars().first()
 
     if not scan:
-        raise HTTPException(status_code=404, detail="Scan not found")
+        res_latest = await db.execute(select(AgentScan).order_by(AgentScan.id.desc()))
+        scan = res_latest.scalars().first()
+
+    if not scan:
+        raise HTTPException(status_code=404, detail="No scans found in database")
+
+    res2 = await db.execute(select(ComplianceCard).where(ComplianceCard.scan_id == scan.id))
+    card = res2.scalars().first()
 
     scan_dict = {
         "agent_name": scan.agent_name,
@@ -43,20 +55,32 @@ async def export_pdf_report(scan_id: int, db: AsyncSession = Depends(get_db)):
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=Agent_Compliance_Audit_Scan_{scan_id}.pdf"}
+        headers={"Content-Disposition": f"attachment; filename=Agent_Compliance_Audit_Scan_{scan.id}.pdf"}
     )
 
 
 @router.get("/json/{scan_id}")
-async def export_json_report(scan_id: int, db: AsyncSession = Depends(get_db)):
-    res1 = await db.execute(select(AgentScan).where(AgentScan.id == scan_id))
-    scan = res1.scalars().first()
-    
-    res2 = await db.execute(select(ComplianceCard).where(ComplianceCard.scan_id == scan_id))
-    card = res2.scalars().first()
+async def export_json_report(scan_id: str, db: AsyncSession = Depends(get_db)):
+    target_id = None
+    try:
+        target_id = int(scan_id)
+    except (ValueError, TypeError):
+        pass
+
+    scan = None
+    if target_id is not None:
+        res1 = await db.execute(select(AgentScan).where(AgentScan.id == target_id))
+        scan = res1.scalars().first()
 
     if not scan:
-        raise HTTPException(status_code=404, detail="Scan not found")
+        res_latest = await db.execute(select(AgentScan).order_by(AgentScan.id.desc()))
+        scan = res_latest.scalars().first()
+
+    if not scan:
+        raise HTTPException(status_code=404, detail="No scans found in database")
+
+    res2 = await db.execute(select(ComplianceCard).where(ComplianceCard.scan_id == scan.id))
+    card = res2.scalars().first()
 
     return {
         "scan": {

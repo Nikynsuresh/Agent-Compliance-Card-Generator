@@ -165,29 +165,42 @@ async def compare_versions(payload: CompareRequest, db: AsyncSession = Depends(g
     return compare_compliance_cards(v1_card_json, v2_card_json, v1_meta, v2_meta)
 
 
+def safe_int(val: Any, default: int) -> int:
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return default
+
+
 @router.get("/export/pdf")
-async def export_diff_pdf(v1_id: int = Query(1), v2_id: int = Query(2), db: AsyncSession = Depends(get_db)):
+async def export_diff_pdf(v1_id: Optional[str] = Query("1"), v2_id: Optional[str] = Query("2"), db: AsyncSession = Depends(get_db)):
     """Exports comparison results as a downloadable PDF report."""
-    diff_data = await compare_versions(CompareRequest(v1_id=v1_id, v2_id=v2_id), db)
+    id1 = safe_int(v1_id, 1)
+    id2 = safe_int(v2_id, 2)
+    diff_data = await compare_versions(CompareRequest(v1_id=id1, v2_id=id2), db)
     pdf_bytes = generate_diff_pdf(diff_data)
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=Card_Diff_{v1_id}_vs_{v2_id}.pdf"}
+        headers={"Content-Disposition": f"attachment; filename=Card_Diff_{id1}_vs_{id2}.pdf"}
     )
 
 
 @router.get("/export/json")
-async def export_diff_json(v1_id: int = Query(1), v2_id: int = Query(2), db: AsyncSession = Depends(get_db)):
+async def export_diff_json(v1_id: Optional[str] = Query("1"), v2_id: Optional[str] = Query("2"), db: AsyncSession = Depends(get_db)):
     """Exports comparison results as JSON."""
-    diff_data = await compare_versions(CompareRequest(v1_id=v1_id, v2_id=v2_id), db)
+    id1 = safe_int(v1_id, 1)
+    id2 = safe_int(v2_id, 2)
+    diff_data = await compare_versions(CompareRequest(v1_id=id1, v2_id=id2), db)
     return diff_data
 
 
 @router.get("/export/html")
-async def export_diff_html(v1_id: int = Query(1), v2_id: int = Query(2), db: AsyncSession = Depends(get_db)):
+async def export_diff_html(v1_id: Optional[str] = Query("1"), v2_id: Optional[str] = Query("2"), db: AsyncSession = Depends(get_db)):
     """Exports comparison results as standalone interactive HTML diff report."""
-    diff_data = await compare_versions(CompareRequest(v1_id=v1_id, v2_id=v2_id), db)
+    id1 = safe_int(v1_id, 1)
+    id2 = safe_int(v2_id, 2)
+    diff_data = await compare_versions(CompareRequest(v1_id=id1, v2_id=id2), db)
     
     rows_html = ""
     for r in diff_data.get("diff_table", []):

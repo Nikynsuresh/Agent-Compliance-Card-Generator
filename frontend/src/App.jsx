@@ -361,7 +361,7 @@ def query_customer_database(sql: str):
               <span>Upload New Agent</span>
             </button>
             <a
-              href={`/api/v1/export/pdf/${currentScan.id}`}
+              href={`/api/v1/export/pdf/${currentScan?.id || selectedScanId || (scans[0] ? scans[0].id : 1)}`}
               target="_blank"
               rel="noreferrer"
               className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl flex items-center space-x-2 transition-all shadow-sm"
@@ -1100,7 +1100,7 @@ def query_customer_database(sql: str):
                   <p className="text-xs text-slate-600 font-medium">Complete ReportLab PDF certificate with card specs and regulatory assessments.</p>
                 </div>
                 <a
-                  href={`/api/v1/export/pdf/${currentScan.id}`}
+                  href={`/api/v1/export/pdf/${currentScan?.id || selectedScanId || (scans[0] ? scans[0].id : 1)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-xs text-center flex items-center justify-center space-x-2 shadow-md shadow-blue-500/20"
@@ -1117,7 +1117,7 @@ def query_customer_database(sql: str):
                   <p className="text-xs text-slate-600 font-medium">Structured JSON payload containing card parameters and risk scores.</p>
                 </div>
                 <a
-                  href={`/api/v1/export/json/${currentScan.id}`}
+                  href={`/api/v1/export/json/${currentScan?.id || selectedScanId || (scans[0] ? scans[0].id : 1)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-6 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-xl text-xs text-center flex items-center justify-center space-x-2 shadow-sm"

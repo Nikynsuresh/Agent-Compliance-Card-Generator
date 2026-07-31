@@ -39,3 +39,6 @@ def compare_agent_versions(v1_data: Dict[str, Any], v2_data: Dict[str, Any]) -> 
         "compliance_score_delta": score_delta,
         "compliance_impact_summary": compliance_warnings or ["No critical governance degradation detected."]
     }
+
+
+compare_agent_scans = compare_agent_versions

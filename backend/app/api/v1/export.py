@@ -43,7 +43,7 @@ async def export_pdf_report(scan_id: int, db: AsyncSession = Depends(get_db)):
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=AgentGuard_Audit_Scan_{scan_id}.pdf"}
+        headers={"Content-Disposition": f"attachment; filename=Agent_Compliance_Audit_Scan_{scan_id}.pdf"}
     )
 
 

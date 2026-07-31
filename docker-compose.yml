@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  agentguard-backend:
+  agent-compliance-backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: agentguard-api
+    container_name: agent-compliance-api
     ports:
       - "8000:8000"
     environment:
       - ENVIRONMENT=production
-      - DATABASE_URL=sqlite+aiosqlite:///./agentguard.db
-      - SECRET_KEY=agentguard-production-jwt-key-2026-secure
+      - DATABASE_URL=sqlite+aiosqlite:///./agent_compliance.db
+      - SECRET_KEY=agent-compliance-production-jwt-key-2026-secure
       - GEMINI_API_KEY=${GEMINI_API_KEY:-""}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

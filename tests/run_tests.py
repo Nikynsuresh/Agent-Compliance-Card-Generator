@@ -14,7 +14,7 @@ from test_compliance_engine import (
 
 def main():
     print("=" * 60)
-    print(" Running AgentGuard AI Native Unit Test Suite...")
+    print(" Running Agent Compliance Card Generator Native Unit Test Suite...")
     print("=" * 60)
 
     # 1. Test AST static code scanner

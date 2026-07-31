@@ -217,7 +217,7 @@ def query_customer_database(sql: str):
                 <Braces className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-blue-600">
-                AgentGuard
+                Agent Compliance Card Generator
               </span>
             </div>
             <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 tracking-wider">

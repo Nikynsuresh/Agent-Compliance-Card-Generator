@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -61,7 +61,7 @@ class ComplianceCardResponse(BaseModel):
     scan_id: int
     agent_purpose: Optional[str]
     llm_and_version: Optional[str]
-    tool_inventory: List[Dict[str, Any]]
+    tool_inventory: List[Union[Dict[str, Any], str]]
     data_sources: List[str]
     decision_authority: str
     human_oversight: str

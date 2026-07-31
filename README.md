@@ -1,4 +1,4 @@
-# 🛡️ AgentGuard AI – Enterprise AI Agent Governance & Compliance Platform
+# 🛡️ Agent Compliance Card Generator – Enterprise AI Agent Governance & Compliance Platform
 
 > **A production-grade, enterprise SaaS platform to audit, reverse-engineer, govern, and generate official Compliance Cards for autonomous AI Agents.**
 
@@ -6,9 +6,9 @@
 
 ## 🌟 Executive Overview
 
-**AgentGuard AI** is an enterprise governance platform designed for AI Safety Officers, SecOps, and Auditors to inspect, analyze, and govern autonomous AI agents.
+**Agent Compliance Card Generator** is an enterprise governance platform designed for AI Safety Officers, SecOps, and Auditors to inspect, analyze, and govern autonomous AI agents.
 
-Unlike generic AI management tools, **AgentGuard AI** focuses strictly on **AI Agent Compliance Cards, Risk Assessment, AST Reverse Engineering, SAST Security Auditing, and Regulatory Reporting** against global AI standards including the **EU AI Act (Article 13)**, **ISO/IEC 42001 (AIMS)**, and **NIST AI Risk Management Framework (AI RMF 1.0)**.
+Unlike generic AI management tools, **Agent Compliance Card Generator** focuses strictly on **AI Agent Compliance Cards, Risk Assessment, AST Reverse Engineering, SAST Security Auditing, and Regulatory Reporting** against global AI standards including the **EU AI Act (Article 13)**, **ISO/IEC 42001 (AIMS)**, and **NIST AI Risk Management Framework (AI RMF 1.0)**.
 
 ---
 

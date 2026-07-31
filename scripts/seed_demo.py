@@ -16,21 +16,21 @@ from app.services.framework_mapper import GovernanceFrameworkMapper
 
 
 async def seed_database():
-    print("Initializing AgentGuard AI database...")
+    print("Initializing Agent Compliance Card Generator database...")
     await init_db()
 
     async with AsyncSessionLocal() as db:
         # 1. Create Admin & Auditor Users
         admin_user = User(
             username="admin",
-            email="admin@agentguard.ai",
+            email="admin@agentcompliance.ai",
             hashed_password=get_password_hash("admin123"),
             full_name="Enterprise Admin",
             role="Admin"
         )
         auditor_user = User(
             username="auditor",
-            email="auditor@agentguard.ai",
+            email="auditor@agentcompliance.ai",
             hashed_password=get_password_hash("auditor123"),
             full_name="Lead AI Auditor",
             role="Auditor"

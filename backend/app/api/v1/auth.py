@@ -18,7 +18,7 @@ async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db)):
     if not user and credentials.username == "admin" and credentials.password == "admin123":
         user = User(
             username="admin",
-            email="admin@agentguard.ai",
+            email="admin@agentcompliance.ai",
             hashed_password=get_password_hash("admin123"),
             full_name="Enterprise Admin",
             role="Admin"
@@ -56,7 +56,7 @@ async def get_current_user(
         return UserResponse(
             id=1,
             username=username or "auditor",
-            email=f"{username or 'auditor'}@agentguard.ai",
+            email=f"{username or 'auditor'}@agentcompliance.ai",
             role=token_payload.get("role", "Auditor"),
             full_name="Enterprise Compliance Auditor"
         )

@@ -10,7 +10,7 @@ async def test_health_check_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert "AgentGuard AI" in data["system"]
+    assert "Agent Compliance Card Generator" in data["system"]
 
 
 @pytest.mark.asyncio

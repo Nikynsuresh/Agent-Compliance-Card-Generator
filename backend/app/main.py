@@ -9,8 +9,8 @@ from app.db.database import init_db
 from app.api.v1.router import api_router
 
 # Prometheus Metrics Definitions
-REQUEST_COUNT = Counter("agentguard_requests_total", "Total HTTP requests", ["method", "endpoint", "status"])
-REQUEST_LATENCY = Histogram("agentguard_request_latency_seconds", "Request latency", ["endpoint"])
+REQUEST_COUNT = Counter("agent_compliance_requests_total", "Total HTTP requests", ["method", "endpoint", "status"])
+REQUEST_LATENCY = Histogram("agent_compliance_request_latency_seconds", "Request latency", ["endpoint"])
 
 
 @asynccontextmanager

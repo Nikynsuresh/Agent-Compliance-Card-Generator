@@ -44,8 +44,8 @@ frontend/.vite/
 # Databases & local state
 *.sqlite3
 *.db
-backend/agentguard.db
-backend/app/agentguard.db
+backend/agent_compliance.db
+backend/app/agent_compliance.db
 
 # Logs & Scratch
 *.log

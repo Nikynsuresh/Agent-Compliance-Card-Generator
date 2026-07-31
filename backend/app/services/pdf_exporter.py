@@ -55,7 +55,7 @@ def generate_compliance_pdf(scan_data: Dict[str, Any], card_data: Dict[str, Any]
     story = []
 
     # Header
-    story.append(Paragraph("<b>AgentGuard AI</b> – Enterprise Compliance Card", title_style))
+    story.append(Paragraph("<b>Agent Compliance Card Generator</b> – Enterprise Compliance Certificate", title_style))
     story.append(Paragraph(f"Official Audit & Governance Certificate | Agent: <b>{scan_data.get('agent_name', 'Agent')}</b>", body_style))
     story.append(Spacer(1, 10))
     story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor("#3b82f6"), spaceAfter=15))
@@ -132,7 +132,7 @@ def generate_compliance_pdf(scan_data: Dict[str, Any], card_data: Dict[str, Any]
         story.append(Paragraph("No custom execution tools detected.", body_style))
 
     story.append(Spacer(1, 20))
-    story.append(Paragraph("<i>Report generated automatically by AgentGuard AI Enterprise Governance Platform.</i>", body_style))
+    story.append(Paragraph("<i>Report generated automatically by Agent Compliance Card Generator Platform.</i>", body_style))
 
     doc.build(story)
     buffer.seek(0)

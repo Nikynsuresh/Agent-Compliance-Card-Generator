@@ -16,6 +16,7 @@ from app.services.discovery_service import discover_agent_assets, extract_zip_an
 from app.services.ast_scanner import scan_python_code
 from app.services.compliance_engine import build_compliance_card_payload
 from app.services.framework_mapper import GovernanceFrameworkMapper
+from app.services.version_service import record_card_version
 
 router = APIRouter()
 
@@ -117,6 +118,16 @@ async def scan_sample_agent(
     db.add(card_rec)
     await db.commit()
 
+    await record_card_version(
+        db=db,
+        scan_id=scan_record.id,
+        agent_name=scan_record.agent_name,
+        version=scan_record.version,
+        card_payload=card_payload,
+        risk_score=scan_record.risk_score,
+        compliance_score=scan_record.compliance_score
+    )
+
     return {
         "id": scan_record.id,
         "agent_name": scan_record.agent_name,
@@ -198,6 +209,16 @@ async def upload_and_scan_zip(
         )
         db.add(card_rec)
         await db.commit()
+
+        await record_card_version(
+            db=db,
+            scan_id=scan_record.id,
+            agent_name=scan_record.agent_name,
+            version=scan_record.version,
+            card_payload=card_payload,
+            risk_score=scan_record.risk_score,
+            compliance_score=scan_record.compliance_score
+        )
 
         return {
             "id": scan_record.id,
@@ -326,6 +347,16 @@ async def scan_github_repository(
         db.add(card_rec)
         await db.commit()
 
+        await record_card_version(
+            db=db,
+            scan_id=scan_record.id,
+            agent_name=scan_record.agent_name,
+            version=scan_record.version,
+            card_payload=card_payload,
+            risk_score=scan_record.risk_score,
+            compliance_score=scan_record.compliance_score
+        )
+
         return {
             "id": scan_record.id,
             "agent_name": scan_record.agent_name,
@@ -412,6 +443,16 @@ async def scan_code_snippet(
     )
     db.add(card_rec)
     await db.commit()
+
+    await record_card_version(
+        db=db,
+        scan_id=scan_record.id,
+        agent_name=scan_record.agent_name,
+        version=scan_record.version,
+        card_payload=card_payload,
+        risk_score=scan_record.risk_score,
+        compliance_score=scan_record.compliance_score
+    )
 
     return {
         "id": scan_record.id,

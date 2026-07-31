@@ -41,3 +41,18 @@ class AuditLog(Base):
     details = Column(Text, nullable=True)
     ip_address = Column(String, default="127.0.0.1")
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class CardVersionHistory(Base):
+    __tablename__ = "card_version_histories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    scan_id = Column(Integer, ForeignKey("agent_scans.id"), nullable=False, index=True)
+    agent_name = Column(String, nullable=False, index=True)
+    version = Column(String, nullable=False)
+    version_number = Column(Integer, default=1)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    compliance_card_json = Column(JSON, default=dict)
+    risk_score = Column(Float, default=0.0)
+    compliance_score = Column(Float, default=100.0)
+

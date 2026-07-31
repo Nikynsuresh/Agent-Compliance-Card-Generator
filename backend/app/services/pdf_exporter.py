@@ -137,3 +137,125 @@ def generate_compliance_pdf(scan_data: Dict[str, Any], card_data: Dict[str, Any]
     doc.build(story)
     buffer.seek(0)
     return buffer.getvalue()
+
+
+def generate_diff_pdf(diff_data: Dict[str, Any]) -> bytes:
+    """
+    Generates a professional enterprise PDF Comparison & Regulatory Reassessment Report.
+    """
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'DiffTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=20,
+        leading=24,
+        textColor=colors.HexColor("#0f172a")
+    )
+    
+    h2_style = ParagraphStyle(
+        'DiffH2',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=13,
+        leading=16,
+        textColor=colors.HexColor("#1e293b"),
+        spaceBefore=12,
+        spaceAfter=6
+    )
+    
+    body_style = ParagraphStyle(
+        'DiffBody',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=colors.HexColor("#334155")
+    )
+
+    story = []
+
+    # Header Title
+    agent_name = diff_data.get("agent_name", "AI Agent")
+    v1 = diff_data.get("baseline_version", "V1")
+    v2 = diff_data.get("target_version", "V2")
+    story.append(Paragraph(f"AI Agent Compliance Card Diff Report: <b>{agent_name}</b>", title_style))
+    story.append(Paragraph(f"Comparative Version Analysis | Baseline <b>{v1}</b> vs Target <b>{v2}</b>", body_style))
+    story.append(Spacer(1, 8))
+    story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor("#2563eb"), spaceAfter=12))
+
+    # Executive Summary Table
+    summary_data = [
+        [Paragraph("<b>Metric</b>", body_style), Paragraph("<b>Baseline (V1)</b>", body_style), Paragraph("<b>Target (V2)</b>", body_style), Paragraph("<b>Delta / Impact</b>", body_style)],
+        ["Compliance Score", f"{diff_data.get('compliance_score_baseline', 0)}%", f"{diff_data.get('compliance_score_target', 0)}%", f"{diff_data.get('compliance_score_delta', 0)}%"],
+        ["Security Risk Score", f"{diff_data.get('risk_score_baseline', 0)}/100", f"{diff_data.get('risk_score_target', 0)}/100", f"+{diff_data.get('risk_score_delta', 0)}"],
+        ["Risk Tier", str(diff_data.get('risk_tier_baseline', 'Low')), str(diff_data.get('risk_tier_target', 'High')), str(diff_data.get('overall_status', 'Modified')).upper()],
+        ["Fields Changed", str(diff_data.get('fields_changed_count', 0)), str(diff_data.get('critical_changes_count', 0)) + " Critical", f"{diff_data.get('frameworks_impacted_count', 0)} Frameworks"]
+    ]
+
+    t_summary = Table(summary_data, colWidths=[130, 120, 120, 150])
+    t_summary.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f1f5f9")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#0f172a")),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    story.append(t_summary)
+    story.append(Spacer(1, 10))
+
+    # AI Executive Summary Box
+    story.append(Paragraph("AI Executive Auditor Summary", h2_style))
+    ai_text = diff_data.get("ai_explanation", "No critical changes detected.")
+    story.append(Paragraph(f"<i>\"{ai_text}\"</i>", body_style))
+    story.append(Spacer(1, 10))
+
+    # Enterprise Diff Table
+    story.append(Paragraph("Field Comparison & Regulatory Reassessment Matrix", h2_style))
+    diff_table = diff_data.get("diff_table", [])
+    if diff_table:
+        table_rows = [[
+            Paragraph("<b>Field</b>", body_style),
+            Paragraph("<b>Old Value</b>", body_style),
+            Paragraph("<b>New Value</b>", body_style),
+            Paragraph("<b>Status</b>", body_style),
+            Paragraph("<b>Severity</b>", body_style),
+            Paragraph("<b>Framework</b>", body_style)
+        ]]
+        for row in diff_table:
+            table_rows.append([
+                Paragraph(str(row.get("field", "")), body_style),
+                Paragraph(str(row.get("old_value", "")), body_style),
+                Paragraph(str(row.get("new_value", "")), body_style),
+                Paragraph(str(row.get("status", "")), body_style),
+                Paragraph(str(row.get("severity", "")), body_style),
+                Paragraph(str(row.get("framework", "")), body_style)
+            ])
+        t_diff = Table(table_rows, colWidths=[100, 100, 100, 80, 60, 80])
+        t_diff.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        story.append(t_diff)
+
+    story.append(Spacer(1, 15))
+    story.append(Paragraph("<i>Generated automatically by Agent Compliance Card Generator Platform (PS-6.1 Card Diff Engine).</i>", body_style))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.getvalue()
+

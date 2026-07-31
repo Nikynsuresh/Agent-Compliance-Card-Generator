@@ -76,6 +76,60 @@ def query_customer_database(sql: str):
     }
   }, [selectedScanId]);
 
+  // Card Diff & Version History State
+  const [versionHistory, setVersionHistory] = useState([]);
+  const [v1Id, setV1Id] = useState('');
+  const [v2Id, setV2Id] = useState('');
+  const [diffResult, setDiffResult] = useState(null);
+  const [loadingDiff, setLoadingDiff] = useState(false);
+
+  const loadVersionHistory = async () => {
+    try {
+      const res = await fetch('/api/v1/diff/versions');
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setVersionHistory(data);
+        if (!v1Id && data.length >= 2) {
+          setV1Id(data[data.length - 1].id);
+          setV2Id(data[0].id);
+        } else if (!v1Id) {
+          setV1Id(data[0].id);
+          setV2Id(data[0].id);
+        }
+      }
+    } catch (e) {}
+  };
+
+  const fetchCardDiff = async (id1, id2) => {
+    if (!id1 || !id2) return;
+    setLoadingDiff(true);
+    try {
+      const res = await fetch('/api/v1/diff/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ v1_id: Number(id1), v2_id: Number(id2) })
+      });
+      const data = await res.json();
+      setDiffResult(data);
+    } catch (e) {
+      showToast('Error loading version comparison diff.');
+    } finally {
+      setLoadingDiff(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      loadVersionHistory();
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'history' && v1Id && v2Id) {
+      fetchCardDiff(v1Id, v2Id);
+    }
+  }, [v1Id, v2Id, activeTab]);
+
   const currentScan = scans.find(s => s.id === selectedScanId) || scans[0] || {
     agent_name: "Agent",
     version: "1.0.0",
@@ -251,6 +305,7 @@ def query_customer_database(sql: str):
               { id: 'mapping', label: 'Compliance Mapping', icon: Layers },
               { id: 'architecture', label: 'Architecture Diagram', icon: Network },
               { id: 'runtime', label: 'Runtime Analysis', icon: Terminal },
+              { id: 'history', label: 'Version History', icon: RefreshCw },
               { id: 'export', label: 'Export', icon: Download },
               { id: 'settings', label: 'Settings', icon: SettingsIcon },
             ].map(tab => {
@@ -757,6 +812,277 @@ def query_customer_database(sql: str):
               <div>[2026-07-30 12:22:02] INFO Registered tools: query_customer_database</div>
               <div>[2026-07-30 12:22:03] INFO Execution trace completed cleanly in 210ms</div>
             </div>
+          </div>
+        )}
+
+        {/* VERSION HISTORY & CARD DIFF PAGE */}
+        {activeTab === 'history' && (
+          <div className="space-y-6">
+            {/* VERSION CONTROL & TIMELINE HEADER */}
+            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <RefreshCw className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-xl font-extrabold tracking-tight text-slate-950">Card Diff & Version History</h2>
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full border border-blue-200">
+                      Git-Style AI Card Comparison
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1 font-medium">
+                    Compare compliance cards across releases to track changed fields, privilege increases, regulatory impact, and risk score deltas.
+                  </p>
+                </div>
+
+                {/* EXPORT DIFF BUTTONS */}
+                <div className="flex items-center space-x-2">
+                  <a
+                    href={`/api/v1/diff/export/pdf?v1_id=${v1Id}&v2_id=${v2Id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl flex items-center space-x-1.5 transition-all shadow-sm"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Comparison PDF</span>
+                  </a>
+                  <a
+                    href={`/api/v1/diff/export/html?v1_id=${v1Id}&v2_id=${v2Id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-extrabold text-xs rounded-xl border border-blue-200 flex items-center space-x-1.5 transition-all"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>HTML Diff Report</span>
+                  </a>
+                  <a
+                    href={`/api/v1/diff/export/json?v1_id=${v1Id}&v2_id=${v2Id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3.5 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 font-extrabold text-xs rounded-xl border border-slate-300 flex items-center space-x-1.5 transition-all"
+                  >
+                    <Braces className="w-3.5 h-3.5" />
+                    <span>JSON</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* VERSION SELECTOR GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className="md:col-span-5 space-y-1">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                    Baseline Version (V1)
+                  </label>
+                  <select
+                    value={v1Id}
+                    onChange={(e) => setV1Id(e.target.value)}
+                    className="w-full text-xs font-semibold p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    {versionHistory.map(v => (
+                      <option key={`v1-${v.id}`} value={v.id}>
+                        {v.agent_name} - Version {v.version_number} (v{v.version}) - {v.compliance_score}% Score
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2 flex justify-center py-1">
+                  <div className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-extrabold shadow-sm">
+                    VS
+                  </div>
+                </div>
+
+                <div className="md:col-span-5 space-y-1">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                    Target Version (V2)
+                  </label>
+                  <select
+                    value={v2Id}
+                    onChange={(e) => setV2Id(e.target.value)}
+                    className="w-full text-xs font-semibold p-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-500"
+                  >
+                    {versionHistory.map(v => (
+                      <option key={`v2-${v.id}`} value={v.id}>
+                        {v.agent_name} - Version {v.version_number} (v{v.version}) - {v.compliance_score}% Score
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* SUMMARY PANEL */}
+            {diffResult && (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Compliance Score</span>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-lg font-extrabold text-slate-900">{diffResult.compliance_score_baseline}%</span>
+                      <span className="text-xs text-slate-400">→</span>
+                      <span className="text-lg font-extrabold text-slate-900">{diffResult.compliance_score_target}%</span>
+                    </div>
+                    <span className={`text-xs font-extrabold px-2 py-0.5 rounded-md inline-block ${
+                      diffResult.compliance_score_delta < 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {diffResult.compliance_score_delta >= 0 ? `+${diffResult.compliance_score_delta}%` : `${diffResult.compliance_score_delta}%`}
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Security Risk</span>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-lg font-extrabold text-slate-900">{diffResult.risk_tier_baseline}</span>
+                      <span className="text-xs text-slate-400">→</span>
+                      <span className="text-lg font-extrabold text-rose-600">{diffResult.risk_tier_target}</span>
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 block">
+                      Delta: +{diffResult.risk_score_delta} pts
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Fields Changed</span>
+                    <div className="text-2xl font-black text-slate-950">{diffResult.fields_changed_count}</div>
+                    <span className="text-xs text-slate-600 font-semibold">Total modifications</span>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Critical Changes</span>
+                    <div className="text-2xl font-black text-rose-600">{diffResult.critical_changes_count}</div>
+                    <span className="text-xs font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 inline-block">
+                      Reassessment Required
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-1">
+                    <span className="text-xs font-bold text-slate-600 uppercase">Frameworks Impacted</span>
+                    <div className="text-2xl font-black text-blue-600">{diffResult.frameworks_impacted_count}</div>
+                    <span className="text-xs text-slate-600 font-semibold">EU AI Act, NIST, ISO</span>
+                  </div>
+                </div>
+
+                {/* AI EXECUTIVE SUMMARY BOX */}
+                <div className="p-5 rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 shadow-sm space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-xs font-extrabold text-slate-950 uppercase tracking-wide">
+                      AI Executive Auditor Summary (Gemini Powered)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-800 font-medium leading-relaxed italic bg-white/90 p-3.5 rounded-xl border border-blue-100 shadow-2xs">
+                    "{diffResult.ai_explanation}"
+                  </p>
+                </div>
+
+                {/* ENTERPRISE DIFF TABLE */}
+                <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                  <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-950">Compliance Card Version Difference Matrix</h3>
+                      <p className="text-xs text-slate-600 mt-0.5">Field-level comparative breakdown and regulatory impact analysis</p>
+                    </div>
+                    <span className={`px-3 py-1 text-xs font-black rounded-full border ${
+                      diffResult.overall_status === 'Critical' ? 'bg-rose-100 text-rose-800 border-rose-300' :
+                      diffResult.overall_status === 'Needs Review' ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                      diffResult.overall_status === 'Modified' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                      'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    }`}>
+                      Overall Status: {diffResult.overall_status}
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-700 uppercase tracking-wider">
+                          <th className="py-3 px-4">Field</th>
+                          <th className="py-3 px-4">Baseline (Old Value)</th>
+                          <th className="py-3 px-4">Target (New Value)</th>
+                          <th className="py-3 px-4">Status</th>
+                          <th className="py-3 px-4">Severity</th>
+                          <th className="py-3 px-4">Affected Framework & Reason</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 text-xs">
+                        {diffResult.diff_table.map((row, idx) => {
+                          const isCritical = row.severity === 'CRITICAL';
+                          const isHigh = row.severity === 'HIGH';
+                          const isMod = row.status === 'Modified' || row.severity === 'MEDIUM';
+
+                          return (
+                            <tr key={idx} className={`hover:bg-slate-50 transition-colors ${
+                              isCritical ? 'bg-rose-50/40' : isHigh ? 'bg-amber-50/30' : ''
+                            }`}>
+                              <td className="py-3.5 px-4 font-bold text-slate-900">{row.field}</td>
+                              <td className="py-3.5 px-4 font-medium text-slate-500 font-mono max-w-xs truncate">{row.old_value}</td>
+                              <td className="py-3.5 px-4 font-extrabold text-slate-900 font-mono max-w-xs truncate">{row.new_value}</td>
+                              <td className="py-3.5 px-4">
+                                <span className={`px-2.5 py-1 rounded-md text-[11px] font-extrabold border inline-block ${
+                                  isCritical ? 'bg-rose-100 text-rose-800 border-rose-300' :
+                                  isHigh ? 'bg-amber-100 text-amber-800 border-amber-300' :
+                                  isMod ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                  'bg-emerald-100 text-emerald-800 border-emerald-300'
+                                }`}>
+                                  {row.status}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4 font-extrabold">
+                                <span className={
+                                  isCritical ? 'text-rose-700' :
+                                  isHigh ? 'text-amber-700' :
+                                  isMod ? 'text-blue-700' : 'text-emerald-700'
+                                }>
+                                  {row.severity}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-1">
+                                  <span className="font-bold text-slate-800 block">{row.framework}</span>
+                                  <span className="text-[11px] text-slate-600 block leading-normal">{row.explanation}</span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* HISTORICAL TIMELINE VIEW */}
+                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Layers className="w-5 h-5 text-slate-700" />
+                    <h3 className="text-base font-extrabold text-slate-950">Agent Compliance Version Timeline</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {versionHistory.map((v) => (
+                      <div key={v.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2 relative">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-extrabold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
+                            Version {v.version_number} (v{v.version})
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-mono">
+                            {v.timestamp ? new Date(v.timestamp).toLocaleDateString() : 'Recent'}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-900">{v.agent_name}</h4>
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+                          <span className="text-slate-600 font-semibold">Compliance: <b>{v.compliance_score}%</b></span>
+                          <span className="text-slate-600 font-semibold">Risk: <b>{v.risk_score}/100</b></span>
+                        </div>
+                        <button
+                          onClick={() => { setV2Id(v.id); }}
+                          className="w-full mt-2 py-1.5 bg-white hover:bg-blue-50 text-blue-600 font-bold text-xs rounded-lg border border-slate-300 hover:border-blue-300 transition-all text-center"
+                        >
+                          Select as Target Version
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 

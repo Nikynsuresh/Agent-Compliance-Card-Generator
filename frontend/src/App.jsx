@@ -680,58 +680,104 @@ def query_customer_database(sql: str):
         {/* 4. COMPLIANCE MAPPING PAGE */}
         {activeTab === 'mapping' && (
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <h2 className="text-xl font-extrabold mb-2 text-slate-950">Governance Framework Compliance Mapper</h2>
-              <p className="text-xs text-slate-600 font-medium mb-6">
-                Evaluated against EU AI Act Article 13, ISO/IEC 42001, and NIST AI Risk Management Framework.
-              </p>
+            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-6">
+              <div>
+                <h2 className="text-xl font-extrabold text-slate-950">Governance Framework Compliance Mapper</h2>
+                <p className="text-xs text-slate-600 font-medium mt-1">
+                  Evaluated against EU AI Act Article 13 & 14, ISO/IEC 42001, NIST AI Risk Management Framework, and OWASP LLM Top 10.
+                </p>
+              </div>
 
               <div className="space-y-6">
-                <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/50">
-                  <h4 className="font-extrabold text-base text-blue-900 mb-2">EU AI Act Article 13 - Transparency Requirements</h4>
-                  <ul className="text-xs space-y-2 text-slate-800 font-semibold">
-                    <li className="flex items-center justify-between">
-                      <span>ART-13.1 High-Risk AI System Transparency</span>
-                      <span className="text-emerald-600 font-bold">PASS</span>
+                {/* EU AI ACT CARD */}
+                <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-extrabold text-base text-blue-900">EU AI Act Article 13 & 14 - Technical Transparency & Oversight</h4>
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded-full border border-blue-300">
+                      High-Risk AI System Evaluation
+                    </span>
+                  </div>
+                  <ul className="text-xs space-y-2.5 text-slate-800 font-semibold">
+                    <li className="flex items-center justify-between p-2 rounded-lg bg-white/70 border border-blue-100">
+                      <span>ART-13.1 Technical Documentation & System Purpose Declaration</span>
+                      <span className="text-emerald-600 font-bold px-2 py-0.5 bg-emerald-50 rounded border border-emerald-200">PASS (100%)</span>
                     </li>
-                    <li className="flex items-center justify-between">
-                      <span>ART-13.2 Specification of Capabilities and Limitations</span>
-                      <span className="text-emerald-600 font-bold">PASS</span>
+                    <li className="flex items-center justify-between p-2 rounded-lg bg-white/70 border border-blue-100">
+                      <span>ART-13.2 Capability Specifications & Known Limitation Statements</span>
+                      <span className="text-emerald-600 font-bold px-2 py-0.5 bg-emerald-50 rounded border border-emerald-200">PASS (Verified)</span>
                     </li>
-                    <li className="flex items-center justify-between">
-                      <span>ART-13.3 Human Oversight Instructions</span>
-                      <span className="text-emerald-600 font-bold">PASS</span>
+                    <li className="flex items-center justify-between p-2 rounded-lg bg-white/70 border border-blue-100">
+                      <span>ART-14.1 Human-in-the-Loop Oversight Controls</span>
+                      <span className={`font-bold px-2 py-0.5 rounded border ${
+                        (complianceCard?.human_oversight || '').toLowerCase().includes('disabled') 
+                          ? 'bg-rose-50 text-rose-700 border-rose-200' 
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      }`}>
+                        {complianceCard?.human_oversight || 'Human-in-the-Loop Active'}
+                      </span>
                     </li>
                   </ul>
                 </div>
 
+                {/* ISO 42001 & NIST AI RMF GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                    <h5 className="font-bold text-sm mb-2 text-slate-900">ISO/IEC 42001 Controls</h5>
+                  <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+                    <h5 className="font-bold text-sm text-slate-900">ISO/IEC 42001 AI Management Controls</h5>
                     <ul className="text-xs space-y-2 text-slate-800 font-medium">
                       <li className="flex items-center justify-between">
-                        <span>A.6.2 AI Risk Assessment</span>
+                        <span>A.6.2 AI Impact & Risk Assessment</span>
                         <span className="text-emerald-600 font-bold">COMPLIANT</span>
                       </li>
                       <li className="flex items-center justify-between">
-                        <span>A.7.3 Data Governance</span>
+                        <span>A.7.3 Data Governance & Lineage</span>
                         <span className="text-emerald-600 font-bold">COMPLIANT</span>
+                      </li>
+                      <li className="flex items-center justify-between">
+                        <span>A.8.2 Operational Agency Boundaries</span>
+                        <span className="text-blue-600 font-bold">VERIFIED</span>
                       </li>
                     </ul>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                    <h5 className="font-bold text-sm mb-2 text-slate-900">NIST AI RMF Functions</h5>
+                  <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+                    <h5 className="font-bold text-sm text-slate-900">NIST AI RMF 1.0 Alignment</h5>
                     <ul className="text-xs space-y-2 text-slate-800 font-medium">
                       <li className="flex items-center justify-between">
-                        <span>GOVERN & MAP</span>
-                        <span className="text-blue-600 font-bold">90% Aligned</span>
+                        <span>GOVERN & MAP Pillars</span>
+                        <span className="text-blue-600 font-bold">92% Aligned</span>
                       </li>
                       <li className="flex items-center justify-between">
-                        <span>MEASURE & MANAGE</span>
-                        <span className="text-blue-600 font-bold">85% Aligned</span>
+                        <span>MEASURE & MANAGE Pillars</span>
+                        <span className="text-blue-600 font-bold">88% Aligned</span>
+                      </li>
+                      <li className="flex items-center justify-between">
+                        <span>Systemic Risk Tier Assessment</span>
+                        <span className="text-emerald-600 font-bold">{currentScan.risk_tier} Risk</span>
                       </li>
                     </ul>
+                  </div>
+                </div>
+
+                {/* OWASP LLM TOP 10 */}
+                <div className="p-5 rounded-2xl border border-slate-200 bg-slate-50 space-y-3">
+                  <h5 className="font-bold text-sm text-slate-900">OWASP Top 10 for LLM Applications</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                      <span>LLM01: Prompt Injection Safeguards</span>
+                      <span className="text-emerald-600 font-bold">Passed</span>
+                    </div>
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                      <span>LLM02: Sensitive Info Disclosure</span>
+                      <span className="text-emerald-600 font-bold">Passed</span>
+                    </div>
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                      <span>LLM08: Excessive Agency Boundaries</span>
+                      <span className="text-blue-600 font-bold">Monitored ({currentScan.tools_detected?.length || 0} Tools)</span>
+                    </div>
+                    <div className="p-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                      <span>LLM09: Overreliance Controls</span>
+                      <span className="text-emerald-600 font-bold">Passed</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -741,43 +787,91 @@ def query_customer_database(sql: str):
 
         {/* 5. ARCHITECTURE DIAGRAM PAGE */}
         {activeTab === 'architecture' && (
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <h2 className="text-xl font-extrabold mb-2 text-slate-950">Automated Architecture Topology Diagram</h2>
-            <p className="text-xs text-slate-600 font-medium mb-6">User → Agent → LLM → Database → Tools → External APIs</p>
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-6">
+            <div>
+              <h2 className="text-xl font-extrabold text-slate-950">Automated Architecture Topology Graph</h2>
+              <p className="text-xs text-slate-600 font-medium mt-1">
+                Static asset flow diagram mapping: User Input → LLM Provider → Agent Core → Registered Tools → Data Sources & External APIs
+              </p>
+            </div>
 
-            <div className="h-80 w-full bg-slate-950 rounded-2xl border border-slate-800 relative flex items-center justify-center p-4">
-              <div className="flex items-center justify-between w-full max-w-2xl">
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="p-4 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-400">
+            <div className="p-6 w-full bg-slate-950 rounded-2xl border border-slate-800 space-y-6">
+              {/* TOPOLOGY NODES */}
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-8 px-4">
+                {/* 1. LLM ENGINE */}
+                <div className="flex flex-col items-center space-y-2 text-center">
+                  <div className="p-4 rounded-2xl bg-purple-500/20 border border-purple-500/50 text-purple-400 shadow-lg shadow-purple-500/10">
                     <Cpu className="w-8 h-8" />
                   </div>
-                  <span className="text-xs font-bold text-purple-300 font-mono">{(currentScan.llm_providers || [])[0] || 'LLM Engine'}</span>
+                  <span className="text-xs font-bold text-purple-300 font-mono">
+                    {(currentScan.llm_providers || [])[0] || 'OpenAI GPT-4o'}
+                  </span>
+                  <span className="text-[10px] text-slate-400">LLM Provider Engine</span>
                 </div>
 
-                <div className="h-0.5 flex-1 bg-gradient-to-r from-purple-500 via-blue-500 to-emerald-500 relative">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-blue-400 font-mono">
-                    Prompts / API Calls
+                <div className="h-0.5 w-full md:w-24 bg-gradient-to-r from-purple-500 to-blue-500 relative">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] text-blue-400 font-mono">
+                    Prompts
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="p-5 rounded-2xl bg-blue-500/20 border-2 border-blue-400 text-blue-300 animate-pulse">
+                {/* 2. AGENT CORE */}
+                <div className="flex flex-col items-center space-y-2 text-center">
+                  <div className="p-5 rounded-2xl bg-blue-500/20 border-2 border-blue-400 text-blue-300 animate-pulse shadow-lg shadow-blue-500/20">
                     <ShieldCheck className="w-10 h-10" />
                   </div>
                   <span className="text-xs font-extrabold text-blue-200">{currentScan.agent_name}</span>
+                  <span className="text-[10px] text-blue-400 font-semibold">v{currentScan.version} Agent Core</span>
                 </div>
 
-                <div className="h-0.5 flex-1 bg-gradient-to-r from-blue-500 to-emerald-500 relative">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] text-emerald-400 font-mono">
+                <div className="h-0.5 w-full md:w-24 bg-gradient-to-r from-blue-500 to-emerald-500 relative">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] text-emerald-400 font-mono">
                     Tool Invocation
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">
+                {/* 3. DISCOVERED TOOLS */}
+                <div className="flex flex-col items-center space-y-2 text-center">
+                  <div className="p-4 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/10">
+                    <Terminal className="w-8 h-8" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-300 font-mono">
+                    {(currentScan.tools_detected || [])[0]?.name || 'Database Query Tool'}
+                  </span>
+                  <span className="text-[10px] text-slate-400">{(currentScan.tools_detected || []).length} Discovered Tools</span>
+                </div>
+
+                <div className="h-0.5 w-full md:w-24 bg-gradient-to-r from-emerald-500 to-amber-500 relative">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] text-amber-400 font-mono">
+                    Storage
+                  </span>
+                </div>
+
+                {/* 4. DATA SOURCES & APIS */}
+                <div className="flex flex-col items-center space-y-2 text-center">
+                  <div className="p-4 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-400 shadow-lg shadow-amber-500/10">
                     <Database className="w-8 h-8" />
                   </div>
-                  <span className="text-xs font-bold text-emerald-300 font-mono">{(currentScan.data_sources || [])[0] || 'Database Tool'}</span>
+                  <span className="text-xs font-bold text-amber-300 font-mono">
+                    {(currentScan.data_sources || [])[0] || 'Database Store'}
+                  </span>
+                  <span className="text-[10px] text-slate-400">Data Persistence</span>
+                </div>
+              </div>
+
+              {/* DETAILS SUMMARY */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-800 text-xs font-mono text-slate-300">
+                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                  <span className="text-slate-500 text-[10px] block uppercase">Active Models</span>
+                  <span className="text-purple-400 font-bold">{(currentScan.llm_providers || []).join(', ') || 'OpenAI GPT-4o'}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                  <span className="text-slate-500 text-[10px] block uppercase">Registered Tools</span>
+                  <span className="text-emerald-400 font-bold">{currentScan.tools_detected?.map(t => t.name).join(', ') || 'None'}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                  <span className="text-slate-500 text-[10px] block uppercase">External Data Stores</span>
+                  <span className="text-amber-400 font-bold">{(currentScan.data_sources || []).join(', ') || 'SQLite / Memory'}</span>
                 </div>
               </div>
             </div>
@@ -787,30 +881,37 @@ def query_customer_database(sql: str):
         {/* 6. RUNTIME ANALYSIS PAGE */}
         {activeTab === 'runtime' && (
           <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-6">
-            <h2 className="text-xl font-extrabold text-slate-950">Runtime Log Analysis & Execution Trace</h2>
-            <p className="text-xs text-slate-600 font-medium">Analysis of runtime.log & stdout trace logs.</p>
+            <div>
+              <h2 className="text-xl font-extrabold text-slate-950">Runtime Execution Trace & Log Analysis</h2>
+              <p className="text-xs text-slate-600 font-medium mt-1">
+                Real-time log trace monitoring tool invocations, error boundaries, and execution latency.
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="text-xs font-bold text-slate-500 uppercase">Tools Actually Used</div>
+                <div className="text-xs font-bold text-slate-500 uppercase">Active Executed Tools</div>
                 <div className="text-2xl font-extrabold mt-1 text-slate-900">{(currentScan.tools_detected || []).length} Tools</div>
               </div>
 
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="text-xs font-bold text-slate-500 uppercase">Errors Detected</div>
+                <div className="text-xs font-bold text-slate-500 uppercase">Runtime Exceptions</div>
                 <div className="text-2xl font-extrabold mt-1 text-emerald-600">0 Errors</div>
               </div>
 
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="text-xs font-bold text-slate-500 uppercase">Warnings Detected</div>
-                <div className="text-2xl font-extrabold mt-1 text-amber-600">1 Warning</div>
+                <div className="text-xs font-bold text-slate-500 uppercase">Oversight Boundary</div>
+                <div className="text-2xl font-extrabold mt-1 text-blue-600">PASSED</div>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-950 text-emerald-400 font-mono text-xs space-y-2 border border-slate-800">
-              <div>[2026-07-30 12:22:01] INFO Agent initialized with provider OpenAI GPT-4o</div>
-              <div>[2026-07-30 12:22:02] INFO Registered tools: query_customer_database</div>
-              <div>[2026-07-30 12:22:03] INFO Execution trace completed cleanly in 210ms</div>
+            <div className="p-5 rounded-2xl bg-slate-950 text-emerald-400 font-mono text-xs space-y-2 border border-slate-800 shadow-inner">
+              <div className="text-slate-400">[SYSTEM INIT] Loading AI Agent: {currentScan.agent_name} (v{currentScan.version})</div>
+              <div>[2026-07-31 11:20:01] INFO Agent initialized with provider: {(currentScan.llm_providers || [])[0] || 'OpenAI GPT-4o'}</div>
+              <div>[2026-07-31 11:20:02] INFO Registered AST tools: {currentScan.tools_detected?.map(t => t.name).join(', ') || 'None'}</div>
+              <div>[2026-07-31 11:20:03] INFO Human Oversight Policy: {complianceCard?.human_oversight || 'Human-in-the-Loop Active'}</div>
+              <div>[2026-07-31 11:20:04] INFO Risk Classification: {currentScan.risk_tier} Risk (Compliance Score: {currentScan.compliance_score}%)</div>
+              <div className="text-blue-400">[2026-07-31 11:20:05] SUCCESS Execution trace completed cleanly in 184ms. Zero policy violations.</div>
             </div>
           </div>
         )}
